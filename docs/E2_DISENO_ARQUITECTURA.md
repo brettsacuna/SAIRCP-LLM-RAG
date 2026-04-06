@@ -39,7 +39,9 @@
 - **Capa de Datos:** ChromaDB (vector store), PostgreSQL (auditoría/metadata), OpenSearch (indexación documental)
 
 *Figura 1. Diagrama C4 Contexto — ver `/docs/architecture/saircp_c4_context_diagram`*  
+<img src="architecture/saircp_c4_context_diagram.svg" alt="Descripción" width="800" height="auto">
 *Figura 2. Diagrama C4 Contenedor — ver `/docs/architecture/saircp_c4_container_diagram`*
+<img src="architecture/saircp_c4_container_diagram.svg" alt="Descripción" width="800" height="auto">
 
 ### 3.2 Descripción de Componentes Arquitectónicos
 
@@ -71,6 +73,7 @@ El ciclo completo de una solicitud de análisis sigue 7 pasos secuenciales:
 7. **Respuesta al usuario:** Se retorna el score de riesgo (BAJO/MEDIO/ALTO), las alertas con fragmentos del documento resaltados, y la evidencia trazable. Se registra la bitácora de auditoría.
 
 *Figura 3. Flujo de datos request→response — ver `/docs/architecture/saircp_data_flow_request_response`*
+<img src="architecture/saircp_data_flow_request_response.svg" alt="Descripción" width="800" height="auto">
 
 ### 3.4 Estrategia de Diseño de Prompts y RAG
 
