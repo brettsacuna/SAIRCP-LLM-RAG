@@ -1,0 +1,268 @@
+openapi: 3.1.0
+info:
+  title: SAIRCP-LLM-RAG API
+  description: >
+    Sistema de Apoyo para la Identificación de Riesgos
+    en Contrataciones Públicas mediante IA — Extensión SEACE 4.0
+  version: 0.1.0
+  contact:
+    name: OECE — Dirección del SEACE
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Desarrollo local
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      operationId: healthCheck
+      tags: [Sistema]
+      responses:
+        "200":
+          description: Estado del sistema
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /analyze:
+    post:
+      summary: Analizar documento de contratación
+      operationId: analyzeDocument
+      tags: [Análisis]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeDocumentRequest"
+      responses:
+        "200":
+          description: Resultado del análisis de riesgo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResult"
+        "422":
+          description: Error de validación
+        "500":
+          description: Error interno
+
+  /analyze/upload:
+    post:
+      summary: Analizar documento cargado (PDF/DOCX)
+      operationId: analyzeUpload
+      tags: [Análisis]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Resultado del análisis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResult"
+
+  /ingest:
+    post:
+      summary: Ingestar documentos al vector store
+      operationId: ingestDocuments
+      tags: [Ingesta]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestDocumentRequest"
+      responses:
+        "200":
+          description: Resultado de la ingesta
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestResponse"
+
+  /query:
+    post:
+      summary: Consulta RAG en lenguaje natural
+      operationId: queryRAG
+      tags: [Consulta]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueryRequest"
+      responses:
+        "200":
+          description: Respuesta generada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryResponse"
+
+components:
+  schemas:
+    AnalyzeDocumentRequest:
+      type: object
+      required: [content, document_type]
+      properties:
+        content:
+          type: string
+          minLength: 50
+        document_type:
+          type: string
+          enum: [TDR, BASES_ADMINISTRATIVAS, ESPECIFICACIONES_TECNICAS, ESTUDIO_MERCADO]
+        process_id:
+          type: string
+        entity_name:
+          type: string
+
+    AnalysisResult:
+      type: object
+      properties:
+        analysis_id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        document_type:
+          type: string
+        total_score:
+          type: integer
+        risk_level:
+          type: string
+          enum: [BAJO, MEDIO, ALTO]
+        alerts:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlertDetail"
+        summary:
+          type: string
+        requirements_found:
+          type: array
+          items:
+            type: string
+        potential_restrictions:
+          type: array
+          items:
+            type: string
+        comparable_processes:
+          type: array
+          items:
+            type: object
+        providers_found:
+          type: array
+          items:
+            type: object
+        processing_time_ms:
+          type: number
+        model_used:
+          type: string
+        trace_id:
+          type: string
+
+    AlertDetail:
+      type: object
+      properties:
+        alert_id:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+          enum: [BAJO, MEDIO, ALTO]
+        indicators:
+          type: array
+          items:
+            $ref: "#/components/schemas/RiskIndicator"
+        document_fragment:
+          type: string
+        recommendation:
+          type: string
+
+    RiskIndicator:
+      type: object
+      properties:
+        indicator:
+          type: string
+        category:
+          type: string
+        weight:
+          type: integer
+        evidence:
+          type: string
+        source:
+          type: string
+
+    IngestDocumentRequest:
+      type: object
+      required: [documents]
+      properties:
+        documents:
+          type: array
+          items:
+            type: object
+        collection:
+          type: string
+
+    IngestResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        indexed_docs:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: string
+
+    QueryRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+          minLength: 5
+        session_id:
+          type: string
+        top_k:
+          type: integer
+          default: 5
+
+    QueryResponse:
+      type: object
+      properties:
+        response:
+          type: string
+        sources:
+          type: array
+          items:
+            type: object
+        tokens_used:
+          type: integer
+        latency_ms:
+          type: number
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        version:
+          type: string
+        components:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
