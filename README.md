@@ -46,6 +46,12 @@ uvicorn src.main:app --reload --port 8000
 curl http://localhost:8000/api/v1/health
 ```
 
+### 5. Ejecutar el frontend
+
+```bash
+cd frontend && python -m http.server 3000
+```
+
 ## Endpoints Principales
 
 | Endpoint | Método | Descripción |
