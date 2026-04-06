@@ -38,8 +38,8 @@
 - **Capa de Procesamiento:** Motor documental (extracción PDF/DOCX), Motor IA (RAG + LLM), Motor de scoring (reglas + pesos)
 - **Capa de Datos:** ChromaDB (vector store), PostgreSQL (auditoría/metadata), OpenSearch (indexación documental)
 
-*Figura 1. Diagrama C4 Contexto — ver `/docs/architecture/c4-context.svg`*  
-*Figura 2. Diagrama C4 Contenedor — ver `/docs/architecture/c4-container.svg`*
+*Figura 1. Diagrama C4 Contexto — ver `/docs/architecture/saircp_c4_context_diagram`*  
+*Figura 2. Diagrama C4 Contenedor — ver `/docs/architecture/saircp_c4_container_diagram`*
 
 ### 3.2 Descripción de Componentes Arquitectónicos
 
@@ -70,7 +70,7 @@ El ciclo completo de una solicitud de análisis sigue 7 pasos secuenciales:
 6. **Agente Generador:** Construye el informe final con resumen ejecutivo, hallazgos clave y recomendaciones.
 7. **Respuesta al usuario:** Se retorna el score de riesgo (BAJO/MEDIO/ALTO), las alertas con fragmentos del documento resaltados, y la evidencia trazable. Se registra la bitácora de auditoría.
 
-*Figura 3. Flujo de datos request→response — ver `/docs/architecture/data-flow.svg`*
+*Figura 3. Flujo de datos request→response — ver `/docs/architecture/saircp_data_flow_request_response`*
 
 ### 3.4 Estrategia de Diseño de Prompts y RAG
 
