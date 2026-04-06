@@ -11,7 +11,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Nombre del Proyecto** | SAIRCP-LLM-RAG: Sistema de Apoyo para Identificación de Riesgos en Contrataciones Públicas mediante IA |
-| **Participante(s)** | Brett Sacuña |
+| **Participante(s)** | Bretts Acuña |
 | **Instructor** | *[Nombre del instructor]* |
 | **Cohorte / Edición** | Cohorte 2025-A |
 | **Fecha de Inicio** | 06/04/2026 |
