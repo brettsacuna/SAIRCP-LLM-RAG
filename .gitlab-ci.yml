@@ -216,12 +216,12 @@ deploy-production:
       echo "🚀 Desplegando backend y frontend..."
       ssh -p ${SSH_PORT} $DEPLOY_SERVER bash -s << EOF
         echo "${HARBOR_PASSWORD}" | docker login ${HARBOR_REGISTRY} -u ${HARBOR_USERNAME} --password-stdin
-        cd /opt/saircp && 
-        docker compose down && 
-        docker compose pull && 
-        docker compose up -d --remove-orphans && 
-        docker compose ps && 
-        sleep 10 && 
+        cd /opt/saircp 
+        docker compose down 
+        docker compose pull 
+        docker compose up -d --remove-orphans 
+        docker compose ps 
+        sleep 10 
         curl -sf http://localhost:8000/api/v1/health || exit 1"
       EOF
   rules:
