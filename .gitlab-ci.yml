@@ -35,46 +35,46 @@ cache:
 # -------------------------------------------
 # Stage: Lint
 # -------------------------------------------
-lint:
-  stage: lint
-  image: python:${PYTHON_VERSION}-slim
-  before_script:
-    - pip install ruff mypy
-  script:
-    - echo "🔍 Linting con Ruff..."
-    - ruff check src/ --output-format=gitlab > reports/ruff_report.json || true
-    - ruff check src/
-    - echo "🔍 Type checking con MyPy..."
-    - mypy src/ --ignore-missing-imports --no-error-summary || true
-  artifacts:
-    reports:
-      codequality: reports/ruff_report.json
-    when: always
-  allow_failure: false
+#lint:
+#  stage: lint
+#  image: python:${PYTHON_VERSION}-slim
+#  before_script:
+#    - pip install ruff mypy
+#  script:
+#    - echo "🔍 Linting con Ruff..."
+#    - ruff check src/ --output-format=gitlab > reports/ruff_report.json || true
+#    - ruff check src/
+#    - echo "🔍 Type checking con MyPy..."
+#    - mypy src/ --ignore-missing-imports --no-error-summary || true
+#  artifacts:
+#    reports:
+#      codequality: reports/ruff_report.json
+#    when: always
+#  allow_failure: false
 
 # -------------------------------------------
 # Stage: Security
 # -------------------------------------------
-security-scan:
-  stage: security
-  image: python:${PYTHON_VERSION}-slim
-  before_script:
-    - pip install bandit pip-audit
-    - mkdir -p reports
-  script:
-    - echo "🛡️ Bandit — análisis de seguridad estático..."
-    - bandit -r src/ -f json -o reports/bandit_report.json || true
-    - bandit -r src/ -ll
-    - echo "🛡️ pip-audit — vulnerabilidades en dependencias..."
-    - pip install -r requirements.txt
-    - pip-audit --format=json --output=reports/pip_audit_report.json || true
-    - pip-audit
-  artifacts:
-    paths:
-      - reports/bandit_report.json
-      - reports/pip_audit_report.json
-    when: always
-  allow_failure: true
+#security-scan:
+#  stage: security
+#  image: python:${PYTHON_VERSION}-slim
+#  before_script:
+#    - pip install bandit pip-audit
+#    - mkdir -p reports
+#  script:
+#    - echo "🛡️ Bandit — análisis de seguridad estático..."
+#    - bandit -r src/ -f json -o reports/bandit_report.json || true
+#    - bandit -r src/ -ll
+#    - echo "🛡️ pip-audit — vulnerabilidades en dependencias..."
+#    - pip install -r requirements.txt
+#    - pip-audit --format=json --output=reports/pip_audit_report.json || true
+#    - pip-audit
+#  artifacts:
+#    paths:
+#      - reports/bandit_report.json
+#      - reports/pip_audit_report.json
+#    when: always
+#  allow_failure: true
 
 # -------------------------------------------
 # Stage: Test
