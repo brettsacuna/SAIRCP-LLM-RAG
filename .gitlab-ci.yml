@@ -222,7 +222,7 @@ deploy-production:
         docker compose up -d --remove-orphans 
         docker compose ps 
         sleep 10 
-        curl -sf http://localhost:8000/api/v1/health || exit 1"
+        curl -sf http://localhost:8000/api/v1/health || exit 1
       EOF
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
