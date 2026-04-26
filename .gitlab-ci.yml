@@ -177,7 +177,8 @@ docker-build-frontend:
     - echo "$HARBOR_PASSWORD" | docker login $HARBOR_REGISTRY -u $HARBOR_USERNAME --password-stdin
   script:
     - echo "🐳 Construyendo imagen Docker multi-stage..."
-    - docker build -f frontend/Dockerfile -t ${CI_REGISTRY_IMAGE}-frontend:${IMAGE_TAG} .
+    - cd frontend
+    - docker build -f Dockerfile -t ${CI_REGISTRY_IMAGE}-frontend:${IMAGE_TAG} .
     - docker push ${CI_REGISTRY_IMAGE}-frontend:${IMAGE_TAG}
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
