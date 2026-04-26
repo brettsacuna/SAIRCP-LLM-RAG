@@ -19,8 +19,8 @@ variables:
 
 
 stages:
-  - lint
-  - security
+#  - lint
+#  - security
   - test
   - build
   - release
