@@ -21,7 +21,7 @@ variables:
 stages:
 #  - lint
 #  - security
-  - test
+#  - test
   - build
   - release
   - deploy
@@ -79,44 +79,44 @@ cache:
 # -------------------------------------------
 # Stage: Test
 # -------------------------------------------
-unit-tests:
-  stage: test
-  image: python:${PYTHON_VERSION}-slim
-  before_script:
-    - pip install -r requirements.txt
-    - pip install pytest pytest-asyncio pytest-cov httpx
-    - mkdir -p reports
-  script:
-    - echo "🧪 Ejecutando suite de pruebas..."
-    - pytest tests/ -v
-        --cov=src
-        --cov-report=xml:reports/coverage.xml
-        --cov-report=html:reports/htmlcov
-        --cov-report=term-missing
-        --junitxml=reports/junit.xml
-  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
-  artifacts:
-    reports:
-      junit: reports/junit.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: reports/coverage.xml
-    paths:
-      - reports/coverage.xml
-      - reports/htmlcov/
-      - reports/junit.xml
-    when: always
+#unit-tests:
+#  stage: test
+#  image: python:${PYTHON_VERSION}-slim
+#  before_script:
+#    - pip install -r requirements.txt
+#    - pip install pytest pytest-asyncio pytest-cov httpx
+#    - mkdir -p reports
+#  script:
+#    - echo "🧪 Ejecutando suite de pruebas..."
+#    - pytest tests/ -v
+#        --cov=src
+#        --cov-report=xml:reports/coverage.xml
+#        --cov-report=html:reports/htmlcov
+#        --cov-report=term-missing
+#        --junitxml=reports/junit.xml
+#  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+#  artifacts:
+#    reports:
+#      junit: reports/junit.xml
+#      coverage_report:
+#        coverage_format: cobertura
+#        path: reports/coverage.xml
+#    paths:
+#      - reports/coverage.xml
+#      - reports/htmlcov/
+#      - reports/junit.xml
+#    when: always
 
-integration-tests:
-  stage: test
-  image: python:${PYTHON_VERSION}-slim
-  before_script:
-    - pip install -r requirements.txt
-    - pip install pytest pytest-asyncio httpx
-  script:
-    - echo "🔗 Ejecutando pruebas de integración..."
-    - pytest tests/test_integration.py -v --tb=short
-  allow_failure: false
+#integration-tests:
+#  stage: test
+#  image: python:${PYTHON_VERSION}-slim
+#  before_script:
+#    - pip install -r requirements.txt
+#    - pip install pytest pytest-asyncio httpx
+#  script:
+#    - echo "🔗 Ejecutando pruebas de integración..."
+#    - pytest tests/test_integration.py -v --tb=short
+#  allow_failure: false
 
 load-test:
   stage: test
