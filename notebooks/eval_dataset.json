@@ -1,0 +1,177 @@
+[
+  {
+    "id": "Q001",
+    "category": "deteccion_marca",
+    "question": "¿El documento menciona una marca específica de equipos?",
+    "expected_answer": "Sí, el documento menciona la marca Dell PowerEdge R750 como requisito para los servidores.",
+    "context": "Se requiere la adquisición de 5 servidores Dell PowerEdge R750 con procesador Intel Xeon Gold 6338."
+  },
+  {
+    "id": "Q002",
+    "category": "expresion_equivalente",
+    "question": "¿Se incluye la expresión 'o equivalente' junto a la marca mencionada?",
+    "expected_answer": "Sí, se incluye la expresión 'o equivalente' junto a la marca Dell PowerEdge R750.",
+    "context": "Marca Dell PowerEdge R750 o equivalente. Procesador Intel Xeon Gold 6338 o superior."
+  },
+  {
+    "id": "Q003",
+    "category": "deteccion_marca",
+    "question": "¿El TDR menciona un modelo específico de procesador?",
+    "expected_answer": "Sí, menciona el procesador Intel Xeon Gold 6338 de 2.0GHz con 32 cores.",
+    "context": "Procesador Intel Xeon Gold 6338 de 2.0GHz, 32 cores, para el Data Center principal."
+  },
+  {
+    "id": "Q004",
+    "category": "certificaciones",
+    "question": "¿Qué certificaciones se exigen al proveedor?",
+    "expected_answer": "Se exige la certificación ISO 27001 del proveedor como requisito obligatorio.",
+    "context": "Certificación ISO 27001 del proveedor. Garantía mínima de 3 años on-site."
+  },
+  {
+    "id": "Q005",
+    "category": "experiencia",
+    "question": "¿Los requisitos de experiencia son razonables o excesivos?",
+    "expected_answer": "Se requiere experiencia mínima de 5 años en sector público con monto facturado de 3 veces el valor referencial, lo cual podría considerarse restrictivo.",
+    "context": "El postor deberá acreditar experiencia mínima de 5 años en venta de equipos de cómputo al sector público, con un monto facturado no menor a 3 veces el valor referencial."
+  },
+  {
+    "id": "Q006",
+    "category": "pluralidad_proveedores",
+    "question": "¿Los requisitos permiten la participación de múltiples proveedores?",
+    "expected_answer": "La mención de marca específica y altos requisitos de experiencia podrían limitar la cantidad de postores elegibles.",
+    "context": "Servidores Dell PowerEdge R750. Experiencia mínima 5 años. Monto facturado 3x valor referencial."
+  },
+  {
+    "id": "Q007",
+    "category": "scoring",
+    "question": "¿Cuántos puntos de riesgo genera la mención explícita de una marca?",
+    "expected_answer": "La mención explícita de una marca genera 20 puntos de riesgo según la regla brand_explicit del modelo de scoring.",
+    "context": "Regla brand_explicit: 20 puntos. Categoría: reglas determinísticas."
+  },
+  {
+    "id": "Q008",
+    "category": "scoring",
+    "question": "¿Cuál es el umbral para clasificar un documento como riesgo ALTO?",
+    "expected_answer": "Un documento se clasifica como riesgo ALTO cuando su score supera los 60 puntos sobre 100.",
+    "context": "SCORE_THRESHOLD_LOW=30, SCORE_THRESHOLD_MEDIUM=60. Score > 60 = ALTO."
+  },
+  {
+    "id": "Q009",
+    "category": "normativa",
+    "question": "¿Qué dice la normativa peruana sobre mencionar marcas en TDR?",
+    "expected_answer": "La Ley 30225 y su Reglamento permiten la referencia a marcas en contrataciones públicas solo cuando se incluye la expresión 'o equivalente' y existe justificación técnica documentada.",
+    "context": "Ley 30225 de Contrataciones del Estado. Artículos referidos a especificaciones técnicas y prohibición de direccionamiento."
+  },
+  {
+    "id": "Q010",
+    "category": "comparativo",
+    "question": "¿Cómo se compara este TDR con procesos similares anteriores?",
+    "expected_answer": "El análisis comparativo busca procesos similares en el vector store y detecta divergencias significativas en requisitos, marcas y restricciones.",
+    "context": "Agente Comparador consulta ChromaDB con embeddings de los requisitos extraídos y calcula similitud coseno."
+  },
+  {
+    "id": "Q011",
+    "category": "deteccion_marca",
+    "question": "¿El documento exige una marca de almacenamiento específica?",
+    "expected_answer": "No se menciona marca de almacenamiento específica, solo se especifica el tipo (SSD) y la capacidad (960GB) en configuración RAID 10.",
+    "context": "Almacenamiento: 4 discos SSD de 960GB en RAID 10."
+  },
+  {
+    "id": "Q012",
+    "category": "scoring",
+    "question": "¿Qué peso tiene la ausencia de la expresión 'o equivalente' en el scoring?",
+    "expected_answer": "La ausencia de la expresión 'o equivalente' genera 15 puntos de riesgo según la regla no_equivalent_expression.",
+    "context": "Regla no_equivalent_expression: 15 puntos. Categoría: reglas determinísticas."
+  },
+  {
+    "id": "Q013",
+    "category": "mercado",
+    "question": "¿Cuántos proveedores potenciales existen para este requerimiento?",
+    "expected_answer": "El agente investigador consulta el RNP y fuentes web para determinar la cantidad de proveedores que pueden cumplir los requisitos.",
+    "context": "Agente Investigador evalúa pluralidad de proveedores consultando RNP y fuentes web abiertas."
+  },
+  {
+    "id": "Q014",
+    "category": "ficha_comercial",
+    "question": "¿El lenguaje del TDR se parece a una ficha comercial?",
+    "expected_answer": "La regla brochure_similarity evalúa si el documento utiliza lenguaje similar a fichas técnicas comerciales de productos específicos, lo cual indicaría posible direccionamiento.",
+    "context": "Regla brochure_similarity: 15 puntos. Detecta similitud con fichas comerciales mediante análisis semántico."
+  },
+  {
+    "id": "Q015",
+    "category": "certificaciones",
+    "question": "¿La certificación ISO 27001 es restrictiva para este tipo de contratación?",
+    "expected_answer": "La certificación ISO 27001 es relevante para servicios de TI pero puede ser restrictiva si se exige al proveedor de hardware y no al servicio asociado.",
+    "context": "Certificación ISO 27001 del proveedor. Contratación de servidores para Data Center."
+  },
+  {
+    "id": "Q016",
+    "category": "plazo",
+    "question": "¿El plazo de entrega es razonable?",
+    "expected_answer": "El plazo de 30 días calendario para servidores importados podría ser ajustado, dependiendo de la disponibilidad del stock en el mercado nacional.",
+    "context": "Plazo de entrega: Treinta (30) días calendario contados desde la suscripción del contrato."
+  },
+  {
+    "id": "Q017",
+    "category": "scoring",
+    "question": "¿Cuál es la fórmula del scoring de riesgo?",
+    "expected_answer": "El score se calcula como la suma ponderada de 13 indicadores activados: Riesgo = Σ(Indicador_i × Peso_i), donde cada indicador tiene un peso entre 5 y 20 puntos.",
+    "context": "13 indicadores de riesgo con pesos: brand_explicit=20, model_specific=20, no_equivalent=15, etc."
+  },
+  {
+    "id": "Q018",
+    "category": "trazabilidad",
+    "question": "¿Cómo se garantiza la trazabilidad del análisis?",
+    "expected_answer": "Cada análisis genera un trace_id único, registra timestamp, modelo usado, tiempo de procesamiento, y cada alerta incluye fragmentos del documento y reglas aplicadas.",
+    "context": "AnalysisResult incluye: trace_id, timestamp, model_used, processing_time_ms. Alertas con evidence y source."
+  },
+  {
+    "id": "Q019",
+    "category": "rag",
+    "question": "¿Qué tamaño de chunk se usa para la indexación de documentos?",
+    "expected_answer": "Se utiliza un chunk size de 1000 caracteres con un overlap de 200 caracteres (20%) para preservar la integridad de los párrafos legales.",
+    "context": "CHUNK_SIZE=1000, CHUNK_OVERLAP=200. Chunking recursivo por caracteres."
+  },
+  {
+    "id": "Q020",
+    "category": "rag",
+    "question": "¿Cuántos documentos se recuperan por consulta RAG?",
+    "expected_answer": "Se recuperan los 5 documentos más relevantes (top_k=5) con un umbral mínimo de similitud coseno de 0.75.",
+    "context": "TOP_K=5, SIMILARITY_THRESHOLD=0.75. Búsqueda por similitud coseno con HNSW en ChromaDB."
+  },
+  {
+    "id": "Q021",
+    "category": "seguridad",
+    "question": "¿Cómo se protege contra prompt injection?",
+    "expected_answer": "Se implementa validación de input, system prompts estrictos con formato JSON, temperature 0.0, y delimitación clara del contenido del documento.",
+    "context": "Controles: validación de longitud, JSON mode, temperature=0.0, system prompts con instrucciones estrictas."
+  },
+  {
+    "id": "Q022",
+    "category": "etica",
+    "question": "¿El sistema reemplaza la evaluación humana?",
+    "expected_answer": "No, el sistema es explícitamente de apoyo y no decisorio. Cada informe incluye un disclaimer indicando que no constituye determinación de ilegalidad.",
+    "context": "Disclaimer: Este resultado es de apoyo y no constituye determinación de ilegalidad. Carácter no decisorio."
+  },
+  {
+    "id": "Q023",
+    "category": "comparativo",
+    "question": "¿Qué modelo de embeddings se usa para la búsqueda semántica?",
+    "expected_answer": "Se utiliza text-embedding-3-small de OpenAI, que genera vectores de 1536 dimensiones con un costo de $0.02 por millón de tokens.",
+    "context": "OPENAI_EMBEDDING_MODEL=text-embedding-3-small. 1536 dimensiones. Búsqueda coseno en ChromaDB."
+  },
+  {
+    "id": "Q024",
+    "category": "scoring",
+    "question": "¿Cuántas categorías de indicadores existen en el modelo de scoring?",
+    "expected_answer": "Existen 4 categorías: reglas determinísticas, análisis de mercado, análisis comparativo y análisis semántico.",
+    "context": "Categorías: reglas_deterministicas, analisis_mercado, analisis_comparativo, analisis_semantico."
+  },
+  {
+    "id": "Q025",
+    "category": "arquitectura",
+    "question": "¿Cuántos agentes participan en el análisis?",
+    "expected_answer": "Participan 5 agentes especializados: Analizador, Comparador, Investigador, Evaluador y Generador, orquestados secuencialmente.",
+    "context": "AgentOrchestrator coordina: AnalyzerAgent → ComparatorAgent → InvestigatorAgent → EvaluatorAgent → ReporterAgent."
+  }
+]

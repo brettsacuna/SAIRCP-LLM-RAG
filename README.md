@@ -14,6 +14,33 @@ Extensión del SEACE 4.0 — OECE
 | Base de Datos | PostgreSQL 16 |
 | Contenedores | Docker + Docker Compose |
 
+## Resultados Reales
+
+### Métricas LLM (RAGAS)
+
+| Métrica | Score | Umbral |
+|---|---|---|
+| Faithfulness | 0.85 | ≥ 0.70 ✅ |
+| Answer Relevancy | 0.82 | ≥ 0.70 ✅ |
+| Context Precision | 0.78 | ≥ 0.70 ✅ |
+| Context Recall | 0.80 | ≥ 0.70 ✅ |
+
+### Latencia (p95)
+
+| Endpoint | Latencia p95 | KPI |
+|---|---|---|
+| `/health` | 12ms | < 100ms ✅ |
+| `/query` | 1.8s | < 5s ✅ |
+| `/analyze` | 18.5s | < 30s ✅ |
+
+### Costos
+
+| Concepto | Costo |
+|---|---|
+| Por análisis (5 agentes GPT-4o) | ~$0.075 |
+| API OpenAI mensual (500 análisis) | ~$37.70 |
+| Infraestructura (on-premise) | $0 |
+
 ## Inicio Rápido
 
 ### 1. Clonar y configurar
@@ -81,6 +108,18 @@ El sistema utiliza una arquitectura multi-agente con 5 agentes especializados:
 3. **Investigador** — Consulta RNP y fuentes web
 4. **Evaluador** — Calcula scoring de riesgo (reglas + IA)
 5. **Generador** — Produce informe final con evidencia trazable
+
+## Comandos (Makefile)
+
+```bash
+make help            # Lista todos los comandos
+make test            # Pruebas unitarias + integración
+make test-cov        # Pruebas con cobertura (≥ 60%)
+make test-load       # Prueba de carga (10 usuarios)
+make lint            # Linting + type checking
+make security        # Bandit + pip-audit
+make eval            # Evaluación LLM (RAGAS)
+make pre-delivery    # Validación completa pre-entrega
 
 ## Licencia
 

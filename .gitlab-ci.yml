@@ -1,0 +1,228 @@
+# ===========================================
+# SAIRCP-LLM-RAG — GitLab CI/CD Pipeline
+# ===========================================
+variables:
+  HARBOR_PROJECT: $CI_PROJECT_NAMESPACE
+  IMAGE_NAME: $CI_PROJECT_NAME
+  IMAGE_TAG: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+  CONTAINER_NAME: $CI_PROJECT_NAME
+  
+  # ==================================================
+  # IMAGENES BASE
+  # ==================================================
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHON_VERSION: "3.11"
+  DOCKER_IMAGE: "${HARBOR_REGISTRY}/library/docker:29.1.4"
+  ALPINE_IMAGE: "${HARBOR_REGISTRY}/library/alpine:latest"
+  
+  CI_REGISTRY_IMAGE: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${IMAGE_NAME}
+
+
+stages:
+  - lint
+  - security
+  - test
+  - build
+  - release
+  - deploy
+
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .cache/pip
+    - .venv/
+
+# -------------------------------------------
+# Stage: Lint
+# -------------------------------------------
+lint:
+  stage: lint
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install ruff mypy
+  script:
+    - echo "🔍 Linting con Ruff..."
+    - ruff check src/ --output-format=gitlab > reports/ruff_report.json || true
+    - ruff check src/
+    - echo "🔍 Type checking con MyPy..."
+    - mypy src/ --ignore-missing-imports --no-error-summary || true
+  artifacts:
+    reports:
+      codequality: reports/ruff_report.json
+    when: always
+  allow_failure: false
+
+# -------------------------------------------
+# Stage: Security
+# -------------------------------------------
+security-scan:
+  stage: security
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install bandit pip-audit
+    - mkdir -p reports
+  script:
+    - echo "🛡️ Bandit — análisis de seguridad estático..."
+    - bandit -r src/ -f json -o reports/bandit_report.json || true
+    - bandit -r src/ -ll
+    - echo "🛡️ pip-audit — vulnerabilidades en dependencias..."
+    - pip install -r requirements.txt
+    - pip-audit --format=json --output=reports/pip_audit_report.json || true
+    - pip-audit
+  artifacts:
+    paths:
+      - reports/bandit_report.json
+      - reports/pip_audit_report.json
+    when: always
+  allow_failure: true
+
+# -------------------------------------------
+# Stage: Test
+# -------------------------------------------
+unit-tests:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install -r requirements.txt
+    - pip install pytest pytest-asyncio pytest-cov httpx
+    - mkdir -p reports
+  script:
+    - echo "🧪 Ejecutando suite de pruebas..."
+    - pytest tests/ -v
+        --cov=src
+        --cov-report=xml:reports/coverage.xml
+        --cov-report=html:reports/htmlcov
+        --cov-report=term-missing
+        --junitxml=reports/junit.xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      junit: reports/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: reports/coverage.xml
+    paths:
+      - reports/coverage.xml
+      - reports/htmlcov/
+      - reports/junit.xml
+    when: always
+
+integration-tests:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install -r requirements.txt
+    - pip install pytest pytest-asyncio httpx
+  script:
+    - echo "🔗 Ejecutando pruebas de integración..."
+    - pytest tests/test_integration.py -v --tb=short
+  allow_failure: false
+
+load-test:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install locust
+    - mkdir -p reports
+  script:
+    - echo "📊 Ejecutando prueba de carga..."
+    - locust -f tests/locustfile.py
+        --headless
+        --users 10
+        --spawn-rate 2
+        --run-time 60s
+        --host http://localhost:8000
+        --csv=reports/load_test
+        --html=reports/load_test_report.html || true
+  artifacts:
+    paths:
+      - reports/load_test*
+    when: always
+  allow_failure: true
+
+# -------------------------------------------
+# Stage: Build
+# -------------------------------------------
+docker-build-backend:
+  stage: build
+  image: $DOCKER_IMAGE
+  before_script:
+    - echo "$HARBOR_PASSWORD" | docker login $HARBOR_REGISTRY -u $HARBOR_USERNAME --password-stdin
+  script:
+    - echo "🐳 Construyendo imagen Docker multi-stage..."
+    - docker build -f Dockerfile -t ${CI_REGISTRY_IMAGE}-backend:${IMAGE_TAG} .
+    - docker push ${CI_REGISTRY_IMAGE}-backend:${IMAGE_TAG}
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
+
+docker-push-backend:
+  stage: release
+  image: $DOCKER_IMAGE
+  before_script:
+    - echo "$HARBOR_PASSWORD" | docker login $HARBOR_REGISTRY -u $HARBOR_USERNAME --password-stdin
+  script:
+    - echo "🏷️ Promocionando a latest..."
+    - docker pull ${CI_REGISTRY_IMAGE}-backend:${IMAGE_TAG}
+    - docker tag ${CI_REGISTRY_IMAGE}-backend:${IMAGE_TAG} ${CI_REGISTRY_IMAGE}-backend:latest
+    - docker push ${CI_REGISTRY_IMAGE}-backend:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+
+docker-build-frontend:
+  stage: build
+  image: $DOCKER_IMAGE
+  before_script:
+    - echo "$HARBOR_PASSWORD" | docker login $HARBOR_REGISTRY -u $HARBOR_USERNAME --password-stdin
+  script:
+    - echo "🐳 Construyendo imagen Docker multi-stage..."
+    - docker build -f frontend/Dockerfile -t ${CI_REGISTRY_IMAGE}-frontend:${IMAGE_TAG} .
+    - docker push ${CI_REGISTRY_IMAGE}-frontend:${IMAGE_TAG}
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
+
+docker-push-frontend:
+  stage: release
+  image: $DOCKER_IMAGE
+  before_script:
+    - echo "$HARBOR_PASSWORD" | docker login $HARBOR_REGISTRY -u $HARBOR_USERNAME --password-stdin
+  script:
+    - echo "🏷️ Promocionando a latest..."
+    - docker pull ${CI_REGISTRY_IMAGE}-frontend:${IMAGE_TAG}
+    - docker tag ${CI_REGISTRY_IMAGE}-frontend:${IMAGE_TAG} ${CI_REGISTRY_IMAGE}-frontend:latest
+    - docker push ${CI_REGISTRY_IMAGE}-frontend:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+
+# -------------------------------------------
+# Stage: deploy
+# -------------------------------------------
+deploy-production:
+  stage: deploy
+  image: $ALPINE_IMAGE
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -p ${SSH_PORT} -H ${DEPLOY_SERVER#*@} >> ~/.ssh/known_hosts
+  script:
+    - |
+      echo "🚀 Deploying ${CI_REGISTRY_IMAGE}:${IMAGE_TAG}..."
+      ssh -p ${SSH_PORT} $DEPLOY_SERVER bash -s << EOF
+        echo "${HARBOR_PASSWORD}" | docker login ${HARBOR_REGISTRY} -u ${HARBOR_USERNAME} --password-stdin
+        cd /opt/saircp &&
+        docker compose down && 
+        docker compose pull &&
+        docker compose up -d --remove-orphans &&
+        docker compose ps &&
+        sleep 10 &&
+        curl -sf http://localhost:8000/api/v1/health || exit 1"
+      EOF
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
