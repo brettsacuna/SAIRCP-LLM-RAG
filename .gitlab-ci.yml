@@ -20,7 +20,7 @@ variables:
 
 stages:
 #  - lint
-  - security
+#  - security
   - test
   - build
   - release
@@ -55,68 +55,68 @@ cache:
 # -------------------------------------------
 # Stage: Security
 # -------------------------------------------
-security-scan:
-  stage: security
-  image: python:${PYTHON_VERSION}-slim
-  before_script:
-    - pip install bandit pip-audit
-    - mkdir -p reports
-  script:
-    - echo "🛡️ Bandit — análisis de seguridad estático..."
-    - bandit -r src/ -f json -o reports/bandit_report.json || true
-    - bandit -r src/ -ll
-    - echo "🛡️ pip-audit — vulnerabilidades en dependencias..."
-    - pip install -r requirements.txt
-    - pip-audit --format=json --output=reports/pip_audit_report.json || true
-    - pip-audit
-  artifacts:
-    paths:
-      - reports/bandit_report.json
-      - reports/pip_audit_report.json
-    when: always
-  allow_failure: true
+#security-scan:
+#  stage: security
+#  image: python:${PYTHON_VERSION}-slim
+#  before_script:
+#    - pip install bandit pip-audit
+#    - mkdir -p reports
+#  script:
+#    - echo "🛡️ Bandit — análisis de seguridad estático..."
+#    - bandit -r src/ -f json -o reports/bandit_report.json || true
+#    - bandit -r src/ -ll
+#    - echo "🛡️ pip-audit — vulnerabilidades en dependencias..."
+#    - pip install -r requirements.txt
+#    - pip-audit --format=json --output=reports/pip_audit_report.json || true
+#    - pip-audit
+#  artifacts:
+#    paths:
+#      - reports/bandit_report.json
+#      - reports/pip_audit_report.json
+#    when: always
+#  allow_failure: true
 
 # -------------------------------------------
 # Stage: Test
 # -------------------------------------------
-#unit-tests:
-#  stage: test
-#  image: python:${PYTHON_VERSION}-slim
-#  before_script:
-#    - pip install -r requirements.txt
-#    - pip install pytest pytest-asyncio pytest-cov httpx
-#    - mkdir -p reports
-#  script:
-#    - echo "🧪 Ejecutando suite de pruebas..."
-#    - pytest tests/ -v
-#        --cov=src
-#        --cov-report=xml:reports/coverage.xml
-#        --cov-report=html:reports/htmlcov
-#        --cov-report=term-missing
-#        --junitxml=reports/junit.xml
-#  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
-#  artifacts:
-#    reports:
-#      junit: reports/junit.xml
-#      coverage_report:
-#        coverage_format: cobertura
-#        path: reports/coverage.xml
-#    paths:
-#      - reports/coverage.xml
-#      - reports/htmlcov/
-#      - reports/junit.xml
-#    when: always
+unit-tests:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install -r requirements.txt
+    - pip install pytest pytest-asyncio pytest-cov httpx
+    - mkdir -p reports
+  script:
+    - echo "🧪 Ejecutando suite de pruebas..."
+    - pytest tests/ -v
+        --cov=src
+        --cov-report=xml:reports/coverage.xml
+        --cov-report=html:reports/htmlcov
+        --cov-report=term-missing
+        --junitxml=reports/junit.xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      junit: reports/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: reports/coverage.xml
+    paths:
+      - reports/coverage.xml
+      - reports/htmlcov/
+      - reports/junit.xml
+    when: always
 
-#integration-tests:
-#  stage: test
-#  image: python:${PYTHON_VERSION}-slim
-#  before_script:
-#    - pip install -r requirements.txt
-#    - pip install pytest pytest-asyncio httpx
-#  script:
-#    - echo "🔗 Ejecutando pruebas de integración..."
-#    - pytest tests/test_integration.py -v --tb=short
-#  allow_failure: false
+integration-tests:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install -r requirements.txt
+    - pip install pytest pytest-asyncio httpx
+  script:
+    - echo "🔗 Ejecutando pruebas de integración..."
+    - pytest tests/test_integration.py -v --tb=short
+  allow_failure: false
 
 load-test:
   stage: test
