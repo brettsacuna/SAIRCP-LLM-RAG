@@ -18,12 +18,15 @@ def _extract_pdf(data: bytes) -> str:
         return "\n".join(page.get_text() for page in doc)
     except ImportError:
         pass
+
     try:
         from PyPDF2 import PdfReader
         reader = PdfReader(io.BytesIO(data))
         return "\n".join(page.extract_text() or "" for page in reader.pages)
-    except ImportError:
-        raise RuntimeError("No PDF library available. Install pymupdf or PyPDF2.")
+    except ImportError as err:
+        raise RuntimeError(
+            "No PDF library available. Install pymupdf or PyPDF2."
+        ) from err
 
 
 def _extract_docx(data: bytes) -> str:
