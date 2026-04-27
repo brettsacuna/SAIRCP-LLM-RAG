@@ -3,11 +3,8 @@
 **Sistema de Apoyo para la Identificación de Riesgos en Contrataciones Públicas mediante IA**  
 Extensión del SEACE 4.0 — OECE
 
-[![Pipeline](https://gitlab.com/ia/saircp-llm-rag/badges/main/pipeline.svg)](https://gitlab.com/ia/saircp-llm-rag/-/pipelines)
-[![Coverage](https://gitlab.com/ia/saircp-llm-rag/badges/main/coverage.svg)](https://gitlab.com/ia/saircp-llm-rag/-/pipelines)
-
-> **URL del sistema:** https://saircp.oece.gob.pe  
-> **Swagger UI:** https://saircp.oece.gob.pe/docs  
+> **URL del sistema:** http://200.37.86.173  
+> **Swagger UI:** http://200.37.86.173/docs  
 > **Video demo:** https://youtu.be/XXXXXXXXX
 
 ---
