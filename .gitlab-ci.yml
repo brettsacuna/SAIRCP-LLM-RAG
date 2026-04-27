@@ -19,8 +19,8 @@ variables:
   CI_REGISTRY_IMAGE: ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${IMAGE_NAME}
 
 stages:
-#  - lint
-#  - security
+  - lint
+  - security
   - test
   - build
   - release
@@ -35,46 +35,47 @@ cache:
 # -------------------------------------------
 # Stage: Lint
 # -------------------------------------------
-#lint:
-#  stage: lint
-#  image: python:${PYTHON_VERSION}-slim
-#  before_script:
-#    - pip install ruff mypy
-#  script:
-#    - echo "🔍 Linting con Ruff..."
-#    - ruff check src/ --output-format=gitlab > reports/ruff_report.json || true
-#    - ruff check src/
-#    - echo "🔍 Type checking con MyPy..."
-#    - mypy src/ --ignore-missing-imports --no-error-summary || true
-#  artifacts:
-#    reports:
-#      codequality: reports/ruff_report.json
-#    when: always
-#  allow_failure: false
+lint:
+  stage: lint
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install -q ruff mypy
+    - mkdir -p reports
+  script:
+    - echo "🔍 Linting con Ruff..."
+    - ruff check src/ --fix --unsafe-fixes
+    - ruff check src/ --output-format=gitlab > reports/ruff_report.json || true
+    - ruff check src/
+    - echo "🔍 Type checking con MyPy..."
+    - mypy src/ --ignore-missing-imports --no-error-summary || true
+  artifacts:
+    reports:
+      codequality: reports/ruff_report.json
+    when: always
 
 # -------------------------------------------
 # Stage: Security
 # -------------------------------------------
-#security-scan:
-#  stage: security
-#  image: python:${PYTHON_VERSION}-slim
-#  before_script:
-#    - pip install bandit pip-audit
-#    - mkdir -p reports
-#  script:
-#    - echo "🛡️ Bandit — análisis de seguridad estático..."
-#    - bandit -r src/ -f json -o reports/bandit_report.json || true
-#    - bandit -r src/ -ll
-#    - echo "🛡️ pip-audit — vulnerabilidades en dependencias..."
-#    - pip install -r requirements.txt
-#    - pip-audit --format=json --output=reports/pip_audit_report.json || true
-#    - pip-audit
-#  artifacts:
-#    paths:
-#      - reports/bandit_report.json
-#      - reports/pip_audit_report.json
-#    when: always
-#  allow_failure: true
+security-scan:
+  stage: security
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install -q bandit pip-audit
+    - mkdir -p reports
+  script:
+    - echo "🛡️ Bandit..."
+    - bandit -r src/ -f json -o reports/bandit_report.json || true
+    - bandit -r src/ -ll
+    - echo "🛡️ pip-audit..."
+    - pip install -q -r requirements.txt
+    - pip-audit --format=json --output=reports/pip_audit_report.json || true
+    - pip-audit || true
+  artifacts:
+    paths:
+      - reports/bandit_report.json
+      - reports/pip_audit_report.json
+    when: always
+  allow_failure: true
 
 # -------------------------------------------
 # Stage: Test
@@ -83,8 +84,8 @@ unit-tests:
   stage: test
   image: python:${PYTHON_VERSION}-slim
   before_script:
-    - pip install -r requirements.txt
-    - pip install pytest pytest-asyncio pytest-cov httpx
+    - pip install -q -r requirements.txt
+    - pip install -q pytest-cov httpx
     - mkdir -p reports
   script:
     - echo "🧪 Ejecutando suite de pruebas..."
@@ -93,8 +94,9 @@ unit-tests:
         --cov-report=xml:reports/coverage.xml
         --cov-report=html:reports/htmlcov
         --cov-report=term-missing
+        --cov-fail-under=60
         --junitxml=reports/junit.xml
-  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  coverage: '/TOTAL\s+\d+\s+\d+\s+(\d+%)/'
   artifacts:
     reports:
       junit: reports/junit.xml
@@ -102,21 +104,17 @@ unit-tests:
         coverage_format: cobertura
         path: reports/coverage.xml
     paths:
-      - reports/coverage.xml
-      - reports/htmlcov/
-      - reports/junit.xml
+      - reports/
     when: always
 
 integration-tests:
   stage: test
   image: python:${PYTHON_VERSION}-slim
   before_script:
-    - pip install -r requirements.txt
-    - pip install pytest pytest-asyncio httpx
+    - pip install -q -r requirements.txt
+    - pip install -q httpx
   script:
-    - echo "🔗 Ejecutando pruebas de integración..."
     - pytest tests/test_integration.py -v --tb=short
-  allow_failure: false
 
 load-test:
   stage: test

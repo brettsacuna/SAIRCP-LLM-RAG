@@ -3,12 +3,11 @@
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 from openai import AsyncOpenAI
+
 from src.core.config import settings
 
 
 class VectorStoreManager:
-    """Wrapper sobre ChromaDB para búsqueda semántica."""
-
     def __init__(self):
         self.client = None
         self.collection = None
@@ -26,28 +25,19 @@ class VectorStoreManager:
 
     async def _get_embedding(self, text: str) -> list[float]:
         response = await self.openai.embeddings.create(
-            model=settings.OPENAI_EMBEDDING_MODEL,
-            input=text,
+            model=settings.OPENAI_EMBEDDING_MODEL, input=text,
         )
         return response.data[0].embedding
 
-    async def add(self, doc_id: str, content: str, metadata: dict = None):
+    async def add(self, doc_id: str, content: str, metadata: dict | None = None):
         embedding = await self._get_embedding(content)
-        self.collection.add(
-            ids=[doc_id],
-            embeddings=[embedding],
-            documents=[content],
-            metadatas=[metadata or {}],
-        )
+        self.collection.add(ids=[doc_id], embeddings=[embedding], documents=[content], metadatas=[metadata or {}])
 
     async def search(self, query: str, top_k: int = 5) -> list[dict]:
         if self.collection.count() == 0:
             return []
         embedding = await self._get_embedding(query)
-        results = self.collection.query(
-            query_embeddings=[embedding],
-            n_results=min(top_k, self.collection.count()),
-        )
+        results = self.collection.query(query_embeddings=[embedding], n_results=min(top_k, self.collection.count()))
         docs = []
         for i in range(len(results["ids"][0])):
             docs.append({

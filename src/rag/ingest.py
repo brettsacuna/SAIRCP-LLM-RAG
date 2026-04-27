@@ -1,8 +1,9 @@
 """Pipeline de ingesta: chunking + embedding + almacenamiento."""
 
 import uuid
-from src.rag.vector_store import VectorStoreManager
+
 from src.core.config import settings
+from src.rag.vector_store import VectorStoreManager
 
 
 class IngestPipeline:
@@ -11,15 +12,19 @@ class IngestPipeline:
 
     def _chunk_text(self, text: str) -> list[str]:
         """Divide texto en chunks con overlap."""
+        if not text:
+            return [""]
         chunks = []
         start = 0
         while start < len(text):
             end = start + settings.CHUNK_SIZE
             chunks.append(text[start:end])
             start += settings.CHUNK_SIZE - settings.CHUNK_OVERLAP
-        return chunks
+            if start >= len(text):
+                break
+        return chunks if chunks else [""]
 
-    async def ingest(self, documents: list[dict], collection: str = None) -> tuple[int, list[str]]:
+    async def ingest(self, documents: list[dict], collection: str | None = None) -> tuple[int, list[str]]:
         count = 0
         errors = []
         for doc in documents:
@@ -32,5 +37,5 @@ class IngestPipeline:
                     await self.vs.add(doc_id, chunk, {**metadata, "chunk_index": i})
                     count += 1
             except Exception as e:
-                errors.append(f"Error ingesting doc {doc.get('id','?')}: {str(e)}")
+                errors.append(f"Error ingesting doc {doc.get('id', '?')}: {e!s}")
         return count, errors

@@ -4,7 +4,6 @@ import io
 
 
 def extract_text(content_bytes: bytes, content_type: str) -> str:
-    """Extrae texto de un archivo PDF o DOCX."""
     if content_type == "application/pdf":
         return _extract_pdf(content_bytes)
     elif "wordprocessingml" in content_type:
@@ -18,9 +17,13 @@ def _extract_pdf(data: bytes) -> str:
         doc = pymupdf.open(stream=data, filetype="pdf")
         return "\n".join(page.get_text() for page in doc)
     except ImportError:
+        pass
+    try:
         from PyPDF2 import PdfReader
         reader = PdfReader(io.BytesIO(data))
         return "\n".join(page.extract_text() or "" for page in reader.pages)
+    except ImportError:
+        raise RuntimeError("No PDF library available. Install pymupdf or PyPDF2.")
 
 
 def _extract_docx(data: bytes) -> str:
