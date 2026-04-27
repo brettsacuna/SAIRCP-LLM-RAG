@@ -33,7 +33,7 @@ async def test_health_contains_required_components(client):
 async def test_health_version_is_set(client):
     response = await client.get("/api/v1/health")
     data = response.json()
-    assert data["version"] == "1.0.0"
+    assert data["version"] == "0.1.0"
 
 
 # =============================================

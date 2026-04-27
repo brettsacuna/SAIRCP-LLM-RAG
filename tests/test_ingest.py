@@ -125,7 +125,7 @@ class TestConfigSettings:
         assert settings.OPENAI_EMBEDDING_MODEL == "text-embedding-3-small"
 
     def test_app_version_is_set(self):
-        assert settings.APP_VERSION == "1.0.0"
+        assert settings.APP_VERSION == "0.1.0"
 
     def test_allowed_origins_is_list(self):
         assert isinstance(settings.ALLOWED_ORIGINS, list)
