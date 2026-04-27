@@ -6,8 +6,8 @@ Extensión del SEACE 4.0 — OECE
 [![Pipeline](https://gitlab.com/ia/saircp-llm-rag/badges/main/pipeline.svg)](https://gitlab.com/ia/saircp-llm-rag/-/pipelines)
 [![Coverage](https://gitlab.com/ia/saircp-llm-rag/badges/main/coverage.svg)](https://gitlab.com/ia/saircp-llm-rag/-/pipelines)
 
-> **URL del sistema:** https://saircp-staging.oece.gob.pe  
-> **Swagger UI:** https://saircp-staging.oece.gob.pe/docs  
+> **URL del sistema:** https://saircp.oece.gob.pe  
+> **Swagger UI:** https://saircp.oece.gob.pe/docs  
 > **Video demo:** https://youtu.be/XXXXXXXXX
 
 ---
