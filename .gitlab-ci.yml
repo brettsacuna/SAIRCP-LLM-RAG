@@ -20,7 +20,7 @@ variables:
 
 stages:
 #  - lint
-#  - security
+  - security
   - test
   - build
   - release
@@ -55,26 +55,26 @@ cache:
 # -------------------------------------------
 # Stage: Security
 # -------------------------------------------
-#security-scan:
-#  stage: security
-#  image: python:${PYTHON_VERSION}-slim
-#  before_script:
-#    - pip install bandit pip-audit
-#    - mkdir -p reports
-#  script:
-#    - echo "🛡️ Bandit — análisis de seguridad estático..."
-#    - bandit -r src/ -f json -o reports/bandit_report.json || true
-#    - bandit -r src/ -ll
-#    - echo "🛡️ pip-audit — vulnerabilidades en dependencias..."
-#    - pip install -r requirements.txt
-#    - pip-audit --format=json --output=reports/pip_audit_report.json || true
-#    - pip-audit
-#  artifacts:
-#    paths:
-#      - reports/bandit_report.json
-#      - reports/pip_audit_report.json
-#    when: always
-#  allow_failure: true
+security-scan:
+  stage: security
+  image: python:${PYTHON_VERSION}-slim
+  before_script:
+    - pip install bandit pip-audit
+    - mkdir -p reports
+  script:
+    - echo "🛡️ Bandit — análisis de seguridad estático..."
+    - bandit -r src/ -f json -o reports/bandit_report.json || true
+    - bandit -r src/ -ll
+    - echo "🛡️ pip-audit — vulnerabilidades en dependencias..."
+    - pip install -r requirements.txt
+    - pip-audit --format=json --output=reports/pip_audit_report.json || true
+    - pip-audit
+  artifacts:
+    paths:
+      - reports/bandit_report.json
+      - reports/pip_audit_report.json
+    when: always
+  allow_failure: true
 
 # -------------------------------------------
 # Stage: Test
